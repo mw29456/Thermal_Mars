@@ -1,0 +1,18 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import planets
+
+
+
+F = 0.5
+m = 10
+n = 5
+b = 20
+sigma = 5.67051196e-8
+chi = 2.7
+R350 = chi / 350 ** 3
+DTSURF = 0.1  # surface temperature accuracy [K]
+DTBOT = DTSURF  # bottom layer temperature accuracy [K]
+NYEARSEQ = 1  # equilibration time [orbits]
+NPERDAY = 24  # minimum number of time steps per diurnal cycle
