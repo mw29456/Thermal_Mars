@@ -1,0 +1,104 @@
+# Constants
+AU = 149.60e9  # Astronomical Unit [m]
+sigma = 5.67e-8  # Stefan-Boltzmann constant [W.m-2.K-4]
+G = 6.67428e-11  # Gravitational constant
+
+# Dependencies
+import numpy as np
+
+
+class Planet:
+    '''
+    A Planet object contains basic planetary data.
+    If P is a Planet object, the data are:
+           P.name = Name of the planet
+           P.R = Mean radius of planet [m]
+           P.g = Surface gravitational acceleration [m.s-2]
+           P.S = Annual mean solar constant (current) [W.m-2]
+           P.psurf = Average atmospheric pressure at the surface [Pa]
+           P.albedo = Bond albedo [fraction]
+           P.emissivity = IR emissivity [fraction]
+           P.Qb = Crustal/basal heat flow (average) [W.m-2]
+           P.gamma = Surface layer thermal inertia [J.m-2.K-1.s-1/2]
+
+           P.rsm = Semi-major axis of orbit about Sun [m]
+           P.rAU = Semi-major axis of orbit about Sun [AU]
+           P.year = Sidereal length of year [s]
+           P.eccentricity =  Orbital eccentricity [unitless]
+           P.day = Mean length of solar day [s]
+           P.obliquity = Obliquity to orbit [radian]
+           P.Lequinox = Longitude of equinox [radian]
+           P.Lp = Longitude of perihelion [radian]
+           P.Tsavg = Mean surface temperature [K]
+           P.Tsmax = Maximum surface temperature [K]
+    For gas giants, "surface" quantities are given at the 1 bar level
+    '''
+
+    # __repr__ object prints out a help string when help is
+    # invoked on the planet object or the planet name is typed
+    def __repr__(self):
+        line1 = \
+            'This planet object contains information on %s\n' % self.name
+        line2 = 'Type \"help(Planet)\" for more information\n'
+        return line1 + line2
+
+    def __init__(self):
+        self.name = None  # Name of the planet
+        self.R = None  # Mean radius of planet
+        self.g = None  # Surface gravitational acceleration
+        self.S = None  # Annual mean solar constant (current)
+        self.psurf = None  # Surface pressure [Pa]
+        self.albedo = None  # Bond albedo
+        self.albedoCoef = [0.0, 0.0]  # Coefficients in variable albedo model
+        self.emissivity = None  # IR emissivity [fraction]
+        self.Qb = None  # Crustal heat flow (average) [W.m-2]
+        self.Gamma = None  # Thermal inertia [J.m-2.K-1.s-1/2]
+        self.ks = None  # Solid (phonon) conductivity at surface [W.m-1.K-1]
+        self.kd = None  # Solid (phonon) conductivity at depth z>>H [W.m.K-1]
+        self.rhos = None  # Density at surface [kg.m-3]
+        self.rhod = None  # Density at depth z>>H [kg.m-3]
+        self.H = None  # e-folding scale of conductivity and density [m]
+        self.cp0 = None  # heat capacity at average surface temp. [J.kg.K-1]
+        self.cpCoeff = None  # Heat capacity polynomial coefficients
+        self.rsm = None  # Semi-major axis
+        self.rAU = None  # Semi-major axis [AU]
+        self.year = None  # Sidereal length of year
+        self.eccentricity = None  # Eccentricity
+        self.day = None  # Mean length of solar day
+        self.obliquity = None  # Obliquity to orbit
+        self.Lequinox = None  # Longitude of equinox
+        self.Lp = None  # Longitude of perihelion
+
+        self.Tsavg = None  # Mean surface temperature
+        self.Tsmax = None  # Maximum surface temperature
+
+    def Teq(self, latitude=0):
+        F = self.S
+        A = self.albedo
+        e = self.emissivity
+        return ((1 - A) * F * np.cos(latitude * np.pi / 180) / (4 * e * sigma)) ** 0.25
+
+
+
+Mars = Planet()
+Mars.name = 'Mars'  # Name of the planet
+Mars.R = 3.390e6  # Mean radius of planet
+Mars.g = 3.71  # Surface gravitational acceleration
+Mars.albedo = .250  # Bond albedo
+Mars.emissivity = 0.95  # Infrared emissivity
+Mars.S = 589.2  # Annual mean solar constant (current)
+Mars.psurf = 632  # Average surface pressure [Pa]
+#
+Mars.rsm = 227.92e9  # Semi-major axis
+Mars.rAU = Mars.rsm / AU  # Semi-major axis [AU]
+Mars.year = 686.98 * 24. * 3600.  # Sidereal length of year [s]
+Mars.eccentricity = .0935  # Eccentricity
+Mars.day = 24.6597 * 3600.  # Mean length of solar day [s]
+Mars.obliquity = 25.19  # Obliquity to orbit [deg]
+Mars.Lequinox = None  # Longitude of equinox [deg]
+#
+Mars.Tsavg = 210.  # Mean surface temperature [K]
+Mars.Tsmax = 295.  # Maximum surface temperature [K]
+Mars.cp0 = 600.  # heat capacity at average surface temp. [J.kg.K-1] [Ledlow et al. 1992]
+Mars.cpCoeff = [8.9093e-9, -1.234e-5, \
+                2.3616e-3, 2.7431, -3.6125]
