@@ -5,14 +5,51 @@ import planets
 
 
 
-F = 0.5
-m = 10
-n = 5
-b = 20
-sigma = 5.67051196e-8
-chi = 2.7
-R350 = chi / 350 ** 3
-DTSURF = 0.1  # surface temperature accuracy [K]
-DTBOT = DTSURF  # bottom layer temperature accuracy [K]
-NYEARSEQ = 1  # equilibration time [orbits]
-NPERDAY = 24  # minimum number of time steps per diurnal cycle
+# Physical constants:
+sigma = 5.67051196e-8 # Stefan-Boltzmann Constant
+#S0 = 1361.0 # Solar constant at 1 AU [W.m-2]
+chi = 2.7 # Radiative conductivity parameter [Mitchell and de Pater, 1994]
+R350 = chi/350**3 # Useful form of the radiative conductivity
+
+# Numerical parameters:
+F = 0.5 # Fourier Mesh Number, must be <= 0.5 for stability
+m = 10 # Number of layers in upper skin depth [default: 10]
+n = 5 # Layer increase with depth: dz[i] = dz[i-1]*(1+1/n) [default: 5]
+b = 20 # Number of skin depths to bottom layer [default: 20]
+
+# Accuracy of temperature calculations
+# The model will run until the change in temperature of the bottom layer
+# is less than DTBOT over one diurnal cycle
+DTSURF = 0.1 # surface temperature accuracy [K]
+DTBOT = DTSURF # bottom layer temperature accuracy [K]
+NYEARSEQ = 1 # equilibration time [orbits]
+NPERDAY = 24 # minimum number of time steps per diurnal cycle
+
+# HEAT EQUATION : dT/dt = K*d^2T/dx^2
+
+N = 100      # number of grid points
+dx = 0.2
+
+# dt = 0.25*(dx^2)/kappa
+# dt =  10000
+K = 10**(-6)
+dt = 0.25*(dx**2)/K
+
+F = (K*dt)/(dx**2)
+a = np.array([1200.])
+b = np.array([300.]*99)
+nsteps = 100    # Number of time steps
+T_1 = np.concatenate((a,b))        # Array representing initial temperatures
+
+T_2 = T_1        # T_2 is a new array representing temperatures at the next time step i.e after dt seconds
+
+for step in range(nsteps):
+    for i in range(1,N-1):
+        T_2[i] = T_1[i] + F*(T_1[i-1]-2*T_1[i]+T_1[i+1])
+
+
+print(T_2)
+plt.plot(T_2)
+plt.ylabel('depth')
+plt.xlabel('time steps')
+plt.show()
